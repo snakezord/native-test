@@ -21,6 +21,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       light: "./assets/icon-light.png",
       dark: "./assets/icon-dark.png",
     },
+    infoPlist: {
+      NSMicrophoneUsageDescription:
+        "This app needs access to your microphone to record audio.",
+    },
   },
   android: {
     package: "your.bundle.identifier",
@@ -52,6 +56,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
           backgroundColor: "#18181B",
           image: "./assets/icon-dark.png",
         },
+      },
+    ],
+    [
+      "expo-audio",
+      {
+        microphonePermission:
+          "Allow $(PRODUCT_NAME) to access your microphone.",
       },
     ],
   ],

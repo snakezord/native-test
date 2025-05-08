@@ -1,0 +1,48 @@
+---
+description: 
+globs: apps/expo/**
+alwaysApply: false
+---
+## General
+- Use TypeScript for all code.
+- Prefer functional components.
+- Use React Native primitives (`View`, `Text`, `Image`, etc.).
+- Use `nativewind` for styling; avoid inline styles.
+
+## Component Structure
+- Export main component as a named export.
+- Place subcomponents and helpers below the main export.
+- Use descriptive prop names and interfaces.
+
+## Navigation
+- Use Expo Router or React Navigation for screen management.
+- Keep navigation logic outside of UI components.
+
+## State & Data Management
+- Use React Query 5 for all async data fetching, caching, and mutations.
+- Use tRPC (`@api` package) for type-safe API calls and server communication.
+- Use React context only for cross-cutting concerns (e.g., theme, auth), not for general state.
+- Avoid Zustand and other client state libraries.
+
+## Styling
+- Use Tailwind/nativewind classes for layout and design.
+- Ensure accessibility (labels, roles, etc.).
+- Optimize for performance (avoid unnecessary re-renders).
+
+## File Naming
+- Use kebab-case for files and directories.
+- Use PascalCase for component names.
+
+## Example
+
+```tsx
+import { View, Text } from 'react-native'
+
+export function MyComponent({ title }: { title: string }) {
+  return (
+    <View className="p-4 bg-white rounded-lg">
+      <Text className="text-lg font-bold">{title}</Text>
+    </View>
+  )
+}
+```
