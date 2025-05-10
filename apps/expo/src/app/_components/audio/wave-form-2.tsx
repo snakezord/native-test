@@ -24,6 +24,7 @@ export interface WaveForm2Props {
   maxBarHeight?: number; // Maximum height of bars in %
   minOpacity?: number; // Minimum opacity for quiet sounds
   volumePower?: number; // Power value for volume transformation
+  visibleWindowSize?: number; // Size of sliding window (default: same as barCount)
 }
 
 export function WaveForm2({
@@ -36,9 +37,10 @@ export function WaveForm2({
   barClassName = "bg-black",
   activeBarClassName = "bg-black",
   minBarHeight = 3,
-  maxBarHeight = 80,
+  maxBarHeight = 75,
   minOpacity = 0.2,
   volumePower = 1.5,
+  visibleWindowSize,
 }: WaveForm2Props) {
   const pulseAnimation = useSharedValue(1);
   // Always create the animated style hook, but only use it conditionally
@@ -68,26 +70,63 @@ export function WaveForm2({
     }
   }, [isRecording, pulseAnimation]);
 
-  // Normalize and enhance waveform data to range 0-1 with more visual differentiation
-  const enhancedWaveform = useMemo(() => {
-    // Generate default bars for empty waveforms
-    if (!waveform.length) return Array(barCount).fill(0.05) as number[];
+  // Determine the visible window of data points
+  const windowSize = visibleWindowSize || barCount;
 
-    // Find the maximum value for normalization
-    const max = Math.max(...waveform, 0.01);
+  // Create a sliding window of visible waveform data
+  const visibleWaveform = useMemo(() => {
+    // If we have no waveform data, return flat line default data
+    if (!waveform.length) return Array(windowSize).fill(0.2) as number[];
 
-    // Sample fewer points from the waveform data when we have a lot
-    let sampledWaveform = [...waveform];
-    if (sampledWaveform.length > barCount) {
-      // Sample points evenly from the full data set to reduce to specified bar count
-      const step = Math.floor(sampledWaveform.length / barCount);
-      sampledWaveform = sampledWaveform
-        .filter((_, index) => index % step === 0)
-        .slice(0, barCount);
+    // If we have less data than our window, use all available data
+    // but pad with empty bars at the beginning so it grows from right to left
+    if (waveform.length <= windowSize) {
+      // Create padding at the start to align data to the right
+      const padding = Array(windowSize - waveform.length).fill(0.2);
+      return [...padding, ...waveform];
     }
 
+    // If we're recording, show the most recent window of data
+    if (isRecording) {
+      return waveform.slice(-windowSize);
+    }
+
+    // During playback, center the window around the current playback position
+    const totalDataPoints = waveform.length;
+    const playheadIndex = Math.floor(progress * totalDataPoints);
+    const halfWindow = Math.floor(windowSize / 2);
+
+    // Calculate start and end indices of the window
+    let startIndex = Math.max(0, playheadIndex - halfWindow);
+    let endIndex = startIndex + windowSize;
+
+    // Handle edge cases
+    if (endIndex > totalDataPoints) {
+      endIndex = totalDataPoints;
+      startIndex = Math.max(0, endIndex - windowSize);
+    }
+
+    return waveform.slice(startIndex, endIndex);
+  }, [waveform, windowSize, progress, isRecording]);
+
+  // Normalize and enhance waveform data to range 0-1 with more visual differentiation
+  const enhancedWaveform = useMemo(() => {
+    // When there's no real data, keep the flat line
+    if (!waveform.length) return Array(windowSize).fill(0.2) as number[];
+
+    if (!visibleWaveform.length) return Array(windowSize).fill(0.2) as number[];
+
+    // Find the maximum value for normalization - only consider actual data points, not padding
+    const realDataPoints = visibleWaveform.filter((v) => v !== 0.2);
+    const max =
+      realDataPoints.length > 0 ? Math.max(...realDataPoints, 0.01) : 0.01;
+
     // Apply transformation to enhance differences between loud and quiet parts
-    return sampledWaveform.map((value) => {
+    // Preserve baseline values (0.2) to show as flat line
+    return visibleWaveform.map((value) => {
+      // Skip normalization for baseline values
+      if (value === 0.2) return value;
+
       // Normalize to 0-1
       const normalized = Math.max(value / max, 0);
 
@@ -96,24 +135,52 @@ export function WaveForm2({
       // Use a much lower minimum (0.05) for truly quiet sounds
       return Math.max(0.05, Math.pow(normalized, volumePower));
     });
-  }, [waveform, barCount, volumePower]);
+  }, [visibleWaveform, windowSize, volumePower, waveform.length]);
 
-  // Calculate active bars based on playback progress
+  // Calculate active bars based on visible window and playback progress
   const activeBarCount = useMemo(() => {
-    return Math.floor(enhancedWaveform.length * progress);
-  }, [enhancedWaveform.length, progress]);
+    if (isRecording) return enhancedWaveform.length; // All bars active when recording
+
+    if (!waveform.length) return 0;
+
+    const totalDataPoints = waveform.length;
+    const windowStartIndex = Math.max(
+      0,
+      Math.floor(waveform.length - visibleWaveform.length),
+    );
+    const playheadIndexInFullData = Math.floor(progress * totalDataPoints);
+
+    // Calculate how many bars in our visible window are before the playhead
+    const activeCount = Math.max(0, playheadIndexInFullData - windowStartIndex);
+    return Math.min(activeCount, enhancedWaveform.length);
+  }, [
+    enhancedWaveform.length,
+    waveform.length,
+    visibleWaveform.length,
+    progress,
+    isRecording,
+  ]);
 
   return (
     <View className="flex-1 flex-row items-center justify-center px-2">
       {enhancedWaveform.map((value, index) => {
         const isActive = index < activeBarCount;
-        // Calculate bar height based on value and min/max settings
-        const barHeight = Math.max(value * maxBarHeight, minBarHeight);
+
+        // Determine if this is a baseline bar (flat line) or audio data
+        const isBaseline = value === 0.2;
+
+        // Calculate bar height - ensure flat line for baseline bars
+        const barHeight = isBaseline
+          ? 10 // Fixed height for baseline state
+          : Math.max(value * maxBarHeight, minBarHeight);
+
         const shouldPulse =
           isRecording && index === enhancedWaveform.length - 1;
 
         // Calculate opacity based on amplitude with greater range
-        const opacity = Math.max(minOpacity, value * 1.2);
+        const opacity = isBaseline
+          ? 0.3 // Fixed opacity for baseline state
+          : Math.max(minOpacity, value * 1.2);
 
         return (
           <Animated.View
