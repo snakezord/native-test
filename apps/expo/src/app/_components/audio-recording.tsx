@@ -60,6 +60,15 @@ export default function AudioRecording() {
           progress={
             isPlaying ? playbackPosition / Math.max(playbackDuration, 1) : 0
           }
+          barCount={20}
+          barWidth={5}
+          barSpacing={3}
+          barClassName="bg-gray-700"
+          activeBarClassName="bg-primary"
+          minBarHeight={3}
+          maxBarHeight={75}
+          minOpacity={0.25}
+          volumePower={1.5}
         />
       </View>
 
@@ -77,7 +86,7 @@ export default function AudioRecording() {
 
       {/* Control buttons */}
       <View className="my-2 w-full flex-row justify-center space-x-4">
-        {!isRecording && !isPaused && !isPlaying ? (
+        {!isRecording && !isPaused && !isPlaying && !recordingData ? (
           /* Start recording */
           <Pressable
             className="h-14 w-14 items-center justify-center rounded-full bg-red-500"
