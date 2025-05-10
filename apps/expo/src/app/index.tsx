@@ -12,7 +12,7 @@ export default function Index() {
       <Stack.Screen options={{ title: "Home Page" }} />
       <View className="h-full w-full bg-background p-4">
         <Text className="pb-2 text-center text-5xl font-bold text-foreground">
-          TODO <Text className="text-primary">T3</Text> Turbo 1
+          ROLAND IS <Text className="text-primary">GAY</Text>
         </Text>
         <AudioRecording />
       </View>
