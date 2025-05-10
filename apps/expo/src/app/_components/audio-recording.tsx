@@ -4,6 +4,7 @@ import { RecordingPresets } from "expo-audio";
 
 import { useAudioRecordingManager } from "./audio/use-audio-recording-manager";
 import { WaveForm2 } from "./audio/wave-form-2";
+import WaveFormPlayback from "./audio/wave-form-playback";
 
 export default function AudioRecording() {
   const {
@@ -71,6 +72,18 @@ export default function AudioRecording() {
     }
   }, [isRecording]);
 
+  // Log playback position for debugging
+  useEffect(() => {
+    if (isPlaying) {
+      console.log(
+        "Playback position:",
+        playbackPosition,
+        "Duration:",
+        playbackDuration,
+      );
+    }
+  }, [isPlaying, playbackPosition, playbackDuration]);
+
   // Determine status text
   const getStatusText = () => {
     if (isRecording) return "Recording in progress...";
@@ -101,23 +114,44 @@ export default function AudioRecording() {
     recordedDuration,
   ]);
 
-  // Generate timeline markers
-  const timelineMarkers = useMemo(() => {
-    const markerCount = 5; // Number of markers to show (start, 1/4, 1/2, 3/4, end)
-    const totalDuration = Math.max(effectiveDuration, 1000); // Ensure at least 1 second for scale
+  // Simplified time display - ensure it updates during playback
+  const currentTime = useMemo(() => {
+    if (isRecording || isPaused) {
+      return formatTime(recordingDuration);
+    } else if (isPlaying) {
+      return formatTime(playbackPosition);
+    } else if (recordingData) {
+      return formatTime(0);
+    }
+    return "00:00";
+  }, [
+    isRecording,
+    isPaused,
+    isPlaying,
+    recordingDuration,
+    playbackPosition,
+    recordingData,
+    formatTime,
+  ]);
 
-    return Array(markerCount)
-      .fill(0)
-      .map((_, index) => {
-        const position = index / (markerCount - 1); // 0, 0.25, 0.5, 0.75, 1
-        const time = Math.floor(totalDuration * position);
-        return {
-          position,
-          time,
-          label: formatTime(time),
-        };
-      });
-  }, [effectiveDuration, formatTime]);
+  const endTime = useMemo(() => {
+    if (recordingData) {
+      return formatTime(effectiveDuration);
+    }
+    return "";
+  }, [recordingData, effectiveDuration, formatTime]);
+
+  // We're no longer using timeline markers
+
+  // Common waveform props shared between both waveform components
+  const waveformBaseProps = {
+    barClassName: "bg-gray-700",
+    activeBarClassName: "bg-primary",
+    minBarHeight: 3,
+    maxBarHeight: 75,
+    minOpacity: 0.25,
+    volumePower: 1.5,
+  };
 
   const barCount = 20; // Match this with the barCount prop passed to WaveForm2
 
@@ -130,62 +164,52 @@ export default function AudioRecording() {
         </Text>
       </View>
 
-      {/* Waveform visualization */}
-      <View className="h-32 w-full overflow-hidden rounded-lg bg-gray-100">
-        <WaveForm2
-          waveform={waveformData}
-          isRecording={isRecording}
-          progress={
-            isPlaying && playbackDuration > 0
-              ? playbackPosition / playbackDuration
-              : 0
-          }
-          barCount={barCount}
-          barWidth={5}
-          barSpacing={3}
-          barClassName="bg-gray-700"
-          activeBarClassName="bg-primary"
-          minBarHeight={3}
-          maxBarHeight={75}
-          minOpacity={0.25}
-          volumePower={1.5}
-          visibleWindowSize={30} // Show 30 bars in the sliding window
-        />
-      </View>
+      {/* Two-part waveform visualization */}
+      <View className="w-full">
+        {/* Top part: Recording visualization (WaveForm2) - always visible */}
+        <View className="mb-1 h-16 w-full overflow-hidden rounded-t-lg bg-gray-100">
+          <WaveForm2
+            waveform={waveformData}
+            isRecording={isRecording}
+            progress={0}
+            barCount={barCount}
+            barWidth={5}
+            barSpacing={3}
+            visibleWindowSize={30}
+            {...waveformBaseProps}
+          />
+        </View>
 
-      {/* Timeline - only show when there is audio */}
-      {(recordingData || isPlaying || isRecording || isPaused) &&
-        effectiveDuration > 0 && (
-          <View className="mb-2 mt-1 w-full flex-row items-center justify-between px-2">
-            {timelineMarkers.map((marker, index) => (
-              <View
-                key={index}
-                style={{
-                  position: "absolute",
-                  left: `${marker.position * 100}%`,
-                  transform: [{ translateX: -10 }],
-                }}
-              >
-                <Text className="text-xs text-gray-500">{marker.label}</Text>
-              </View>
-            ))}
+        {/* Bottom part: Playback visualization (WaveFormPlayback) - only visible when there's a recording */}
+        {recordingData && (
+          <View className="h-16 w-full overflow-hidden rounded-b-lg bg-gray-100">
+            <WaveFormPlayback
+              waveform={recordingData.waveformData}
+              progress={
+                isPlaying && playbackDuration > 0
+                  ? playbackPosition / playbackDuration
+                  : 0
+              }
+              maxBars={80}
+              {...waveformBaseProps}
+            />
           </View>
         )}
+      </View>
 
-      {/* Time display */}
+      {/* Simplified time display - no timeline markers */}
+
+      {/* Simplified time display */}
       <View className="my-2 w-full flex-row justify-between">
-        <Text className="text-gray-700">
-          {isRecording || isPaused
-            ? formatTime(recordingDuration)
-            : isPlaying
-              ? formatTime(playbackPosition)
-              : recordingData
-                ? formatTime(recordedDuration)
-                : "00:00"}
+        <Text className="font-medium text-gray-700">
+          {/* Current time: Using memoized value to ensure updates */}
+          {currentTime}
         </Text>
-        <Text className="text-gray-700">
-          {isPlaying || recordingData ? formatTime(effectiveDuration) : ""}
-        </Text>
+
+        {/* End time: hide when playing, show otherwise if we have a recording */}
+        {!isPlaying && recordingData && (
+          <Text className="text-gray-700">{endTime}</Text>
+        )}
       </View>
 
       {/* Control buttons */}

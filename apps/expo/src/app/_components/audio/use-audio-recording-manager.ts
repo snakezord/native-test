@@ -63,9 +63,27 @@ export function useAudioRecordingManager(
 
   // Initialize recorder and player
   const recorder = useAudioRecorder(options);
+  // Update more frequently (100ms) for smoother playback position updates
   const recorderState = useAudioRecorderState(recorder, updateInterval);
   const player = useAudioPlayer(recordingData?.uri);
+  // We can't adjust the update interval here, but we'll poll more frequently below
   const playerStatus = useAudioPlayerStatus(player);
+
+  // Manual polling for more frequent playback position updates
+  const [manualPlaybackPosition, setManualPlaybackPosition] = useState(0);
+
+  // Poll player position more frequently during playback
+  useEffect(() => {
+    if (player && playerStatus.playing) {
+      const timer = setInterval(() => {
+        // Get current time directly from player
+        const currentTime = player.currentTime;
+        setManualPlaybackPosition(currentTime * 1000); // Convert to ms
+      }, 100); // Poll every 100ms
+
+      return () => clearInterval(timer);
+    }
+  }, [player, playerStatus.playing]);
 
   // Generate waveform data during recording
   useEffect(() => {
@@ -252,8 +270,9 @@ export function useAudioRecordingManager(
 
     // Playback states
     isPlaying,
-    playbackPosition: playerStatus.currentTime || 0,
-    playbackDuration: playerStatus.duration || 0,
+    playbackPosition:
+      manualPlaybackPosition || playerStatus.currentTime * 1000 || 0,
+    playbackDuration: playerStatus.duration * 1000 || 0, // Convert to ms
 
     // Actions
     startRecording,
