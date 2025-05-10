@@ -22,7 +22,7 @@
     "@trpc/client": "catalog:",
     "@trpc/server": "catalog:",
     "@trpc/tanstack-react-query": "catalog:",
-    "expo": "53.0.8",
+    "expo": "53.0.9",
     "expo-audio": "^0.4.5",
     "expo-constants": "17.1.6",
     "expo-dev-client": "5.1.8",

@@ -1,9 +1,5 @@
-import type {
-  AudioPlayer,
-  AudioRecorder,
-  RecorderState,
-  RecordingOptions,
-} from "expo-audio";
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import type { RecordingOptions } from "expo-audio";
 import { useCallback, useEffect, useState } from "react";
 import {
   RecordingPresets,
@@ -33,11 +29,11 @@ export interface UseAudioRecordingManagerResult {
 
   // Actions
   startRecording: () => Promise<void>;
-  pauseRecording: () => Promise<void>;
-  resumeRecording: () => Promise<void>;
+  pauseRecording: () => void;
+  resumeRecording: () => void;
   stopRecording: () => Promise<void>;
   playRecording: () => Promise<void>;
-  pausePlayback: () => Promise<void>;
+  pausePlayback: () => void;
   stopPlayback: () => Promise<void>;
   resetRecording: () => void;
 }
@@ -91,21 +87,18 @@ export function useAudioRecordingManager(
       setWaveformData([]);
 
       // Using actual recorder methods from AudioModule.types.ts
-      if (recorder) {
-        // First prepare to record with options
-        await recorder.prepareToRecordAsync(options);
-        // Then start recording
-        recorder.record();
-      }
+      // First prepare to record with options
+      await recorder.prepareToRecordAsync(options);
+      // Then start recording
+      recorder.record();
     } catch (error) {
       console.error("Failed to start recording:", error);
     }
   }, [recorder, options]);
 
-  const pauseRecording = useCallback(async () => {
-    if (isRecording && recorder) {
+  const pauseRecording = useCallback(() => {
+    if (isRecording) {
       try {
-        // Using actual recorder methods from AudioModule.types.ts
         recorder.pause();
         setIsPausedState(true);
       } catch (error) {
@@ -114,10 +107,9 @@ export function useAudioRecordingManager(
     }
   }, [recorder, isRecording]);
 
-  const resumeRecording = useCallback(async () => {
-    if (isPaused && recorder) {
+  const resumeRecording = useCallback(() => {
+    if (isPaused) {
       try {
-        // Resume recording by calling record again
         recorder.record();
         setIsPausedState(false);
       } catch (error) {
@@ -127,16 +119,11 @@ export function useAudioRecordingManager(
   }, [recorder, isPaused]);
 
   const stopRecording = useCallback(async () => {
-    if ((isRecording || isPaused) && recorder) {
+    if (isRecording || isPaused) {
       try {
-        // Stop recording
         await recorder.stop();
-
-        // Get the recording URI from the recorder
         const uri = recorder.uri;
-
         setIsPausedState(false);
-
         if (uri) {
           setRecordingData({
             uri,
@@ -151,13 +138,12 @@ export function useAudioRecordingManager(
 
   // Playback actions
   const playRecording = useCallback(async () => {
-    if (recordingData && player) {
+    if (recordingData) {
       try {
         // If playback finished, seek back to start
-        if (playerStatus && playerStatus.currentTime >= playerStatus.duration) {
+        if (playerStatus.currentTime >= playerStatus.duration) {
           await player.seekTo(0);
         }
-        // Start playback
         player.play();
       } catch (error) {
         console.error("Failed to play recording:", error);
@@ -165,10 +151,9 @@ export function useAudioRecordingManager(
     }
   }, [player, playerStatus, recordingData]);
 
-  const pausePlayback = useCallback(async () => {
-    if (player && isPlaying) {
+  const pausePlayback = useCallback(() => {
+    if (isPlaying) {
       try {
-        // Pause playback
         player.pause();
       } catch (error) {
         console.error("Failed to pause playback:", error);
@@ -177,14 +162,11 @@ export function useAudioRecordingManager(
   }, [player, isPlaying]);
 
   const stopPlayback = useCallback(async () => {
-    if (player) {
-      try {
-        // Pause and seek to beginning to simulate stop
-        player.pause();
-        await player.seekTo(0);
-      } catch (error) {
-        console.error("Failed to stop playback:", error);
-      }
+    try {
+      player.pause();
+      await player.seekTo(0);
+    } catch (error) {
+      console.error("Failed to stop playback:", error);
     }
   }, [player]);
 
@@ -197,7 +179,7 @@ export function useAudioRecordingManager(
   useEffect(() => {
     return () => {
       void (async () => {
-        if (recorder && (isRecording || isPaused)) {
+        if (isRecording || isPaused) {
           try {
             await recorder.stop();
           } catch (e) {
@@ -205,13 +187,10 @@ export function useAudioRecordingManager(
           }
         }
 
-        if (player) {
-          try {
-            // Release resources
-            player.remove();
-          } catch (e) {
-            console.error("Error cleaning up player:", e);
-          }
+        try {
+          player.remove();
+        } catch (e) {
+          console.error("Error cleaning up player:", e);
         }
       })();
     };
@@ -241,3 +220,5 @@ export function useAudioRecordingManager(
     resetRecording,
   };
 }
+
+export default useAudioRecordingManager;

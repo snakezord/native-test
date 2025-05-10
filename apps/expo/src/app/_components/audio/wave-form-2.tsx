@@ -15,6 +15,10 @@ export interface WaveForm2Props {
 
 export function WaveForm2({ waveform, isRecording, progress }: WaveForm2Props) {
   const pulseAnimation = useSharedValue(1);
+  // Always create the animated style hook, but only use it conditionally
+  const pulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scaleY: pulseAnimation.value }],
+  }));
 
   // Create a pulsing animation for recording indicator
   useEffect(() => {
@@ -47,13 +51,8 @@ export function WaveForm2({ waveform, isRecording, progress }: WaveForm2Props) {
       {normalizedWaveform.map((value, index) => {
         const isActive = index < activeBarCount;
         const barHeight = Math.max(value * 100, 5);
-
-        const pulseStyleForLastBar =
-          isRecording && index === normalizedWaveform.length - 1
-            ? useAnimatedStyle(() => ({
-                transform: [{ scaleY: pulseAnimation.value }],
-              }))
-            : undefined;
+        const shouldPulse =
+          isRecording && index === normalizedWaveform.length - 1;
 
         return (
           <Animated.View
@@ -62,7 +61,7 @@ export function WaveForm2({ waveform, isRecording, progress }: WaveForm2Props) {
               {
                 height: `${barHeight}%`,
               },
-              pulseStyleForLastBar,
+              shouldPulse ? pulseStyle : undefined,
             ]}
             className={`mx-0.5 w-1 rounded-full ${
               isActive ? "bg-blue-500" : "bg-gray-400"

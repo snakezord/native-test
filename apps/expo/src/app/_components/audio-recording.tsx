@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { RecordingPresets } from "expo-audio";
 
