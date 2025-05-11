@@ -153,8 +153,6 @@ export default function AudioRecording() {
     volumePower: 1.5,
   };
 
-  const barCount = 20; // Match this with the barCount prop passed to WaveForm2
-
   return (
     <View className="w-full items-center p-4">
       {/* Status indicator */}
@@ -172,10 +170,9 @@ export default function AudioRecording() {
             waveform={waveformData}
             isRecording={isRecording}
             progress={0}
-            barCount={barCount}
+            barCount={30}
             barWidth={5}
             barSpacing={3}
-            visibleWindowSize={30}
             {...waveformBaseProps}
           />
         </View>

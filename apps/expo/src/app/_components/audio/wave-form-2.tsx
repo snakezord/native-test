@@ -14,7 +14,7 @@ export interface WaveForm2Props {
   waveform: number[];
   isRecording: boolean;
   progress: number;
-  // New configurable parameters
+  // Configurable parameters
   barCount?: number; // Number of bars to display
   barWidth?: number; // Width of each bar in px
   barSpacing?: number; // Space between bars in px
@@ -24,7 +24,6 @@ export interface WaveForm2Props {
   maxBarHeight?: number; // Maximum height of bars in %
   minOpacity?: number; // Minimum opacity for quiet sounds
   volumePower?: number; // Power value for volume transformation
-  visibleWindowSize?: number; // Size of sliding window (default: same as barCount)
 }
 
 export function WaveForm2({
@@ -40,7 +39,6 @@ export function WaveForm2({
   maxBarHeight = 75,
   minOpacity = 0.2,
   volumePower = 1.5,
-  visibleWindowSize,
 }: WaveForm2Props) {
   const pulseAnimation = useSharedValue(1);
   // Always create the animated style hook, but only use it conditionally
@@ -70,51 +68,48 @@ export function WaveForm2({
     }
   }, [isRecording, pulseAnimation]);
 
-  // Determine the visible window of data points
-  const windowSize = visibleWindowSize ?? barCount;
-
   // Create a sliding window of visible waveform data
   const visibleWaveform = useMemo(() => {
     // If we have no waveform data, return flat line default data
-    if (!waveform.length) return Array(windowSize).fill(0.2) as number[];
+    if (!waveform.length) return Array(barCount).fill(0.2) as number[];
 
     // If we have less data than our window, use all available data
     // but pad with empty bars at the beginning so it grows from right to left
-    if (waveform.length <= windowSize) {
+    if (waveform.length <= barCount) {
       // Create padding at the start to align data to the right
-      const padding = Array(windowSize - waveform.length).fill(0.2) as number[];
+      const padding = Array(barCount - waveform.length).fill(0.2) as number[];
       return [...padding, ...waveform];
     }
 
     // If we're recording, show the most recent window of data
     if (isRecording) {
-      return waveform.slice(-windowSize);
+      return waveform.slice(-barCount);
     }
 
     // During playback, center the window around the current playback position
     const totalDataPoints = waveform.length;
     const playheadIndex = Math.floor(progress * totalDataPoints);
-    const halfWindow = Math.floor(windowSize / 2);
+    const halfWindow = Math.floor(barCount / 2);
 
     // Calculate start and end indices of the window
     let startIndex = Math.max(0, playheadIndex - halfWindow);
-    let endIndex = startIndex + windowSize;
+    let endIndex = startIndex + barCount;
 
     // Handle edge cases
     if (endIndex > totalDataPoints) {
       endIndex = totalDataPoints;
-      startIndex = Math.max(0, endIndex - windowSize);
+      startIndex = Math.max(0, endIndex - barCount);
     }
 
     return waveform.slice(startIndex, endIndex);
-  }, [waveform, windowSize, progress, isRecording]);
+  }, [waveform, barCount, progress, isRecording]);
 
   // Normalize and enhance waveform data to range 0-1 with more visual differentiation
   const enhancedWaveform = useMemo(() => {
     // When there's no real data, keep the flat line
-    if (!waveform.length) return Array(windowSize).fill(0.2) as number[];
+    if (!waveform.length) return Array(barCount).fill(0.2) as number[];
 
-    if (!visibleWaveform.length) return Array(windowSize).fill(0.2) as number[];
+    if (!visibleWaveform.length) return Array(barCount).fill(0.2) as number[];
 
     // Find the maximum value for normalization - only consider actual data points, not padding
     const realDataPoints = visibleWaveform.filter((v) => v !== 0.2);
@@ -135,7 +130,7 @@ export function WaveForm2({
       // Use a much lower minimum (0.05) for truly quiet sounds
       return Math.max(0.05, Math.pow(normalized, volumePower));
     });
-  }, [visibleWaveform, windowSize, volumePower, waveform.length]);
+  }, [visibleWaveform, barCount, volumePower, waveform.length]);
 
   // Calculate active bars based on visible window and playback progress
   const activeBarCount = useMemo(() => {
