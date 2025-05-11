@@ -33,8 +33,8 @@ export function WaveFormPlayback({
 }: WaveFormPlaybackProps) {
   // Sample data points to fit within maxBars
   const sampledWaveform = useMemo(() => {
-    if (!waveform?.length) {
-      return Array(maxBars).fill(0.2);
+    if (!waveform.length) {
+      return Array(maxBars).fill(0.2) as number[];
     }
 
     // If we have fewer data points than maxBars, use all of them
@@ -48,7 +48,7 @@ export function WaveFormPlayback({
 
     for (let i = 0; i < maxBars; i++) {
       const index = Math.min(Math.floor(i * step), waveform.length - 1);
-      result.push(waveform[index]);
+      result.push(waveform[index] ?? 0);
     }
 
     return result;
@@ -56,7 +56,7 @@ export function WaveFormPlayback({
 
   // Normalize and enhance waveform data
   const enhancedWaveform = useMemo(() => {
-    if (!sampledWaveform.length) return Array(maxBars).fill(0.2);
+    if (!sampledWaveform.length) return Array(maxBars).fill(0.2) as number[];
 
     // Find the maximum value for normalization
     const max = Math.max(...sampledWaveform, 0.01);

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { Pressable, Text, View } from "react-native";
 import { RecordingPresets } from "expo-audio";
 
@@ -28,14 +28,14 @@ export default function AudioRecording() {
   } = useAudioRecordingManager(RecordingPresets.HIGH_QUALITY);
 
   // Format time in mm:ss format
-  const formatTime = (milliseconds: number) => {
+  const formatTime = useCallback((milliseconds: number) => {
     // Ensure milliseconds is a number and not zero when displaying recording or playback time
     const ms = typeof milliseconds === "number" ? milliseconds : 0;
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-  };
+  }, []);
 
   // Store recording duration for use when stopped
   const [recordedDuration, setRecordedDuration] = React.useState(0);

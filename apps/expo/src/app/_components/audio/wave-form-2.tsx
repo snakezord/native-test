@@ -71,7 +71,7 @@ export function WaveForm2({
   }, [isRecording, pulseAnimation]);
 
   // Determine the visible window of data points
-  const windowSize = visibleWindowSize || barCount;
+  const windowSize = visibleWindowSize ?? barCount;
 
   // Create a sliding window of visible waveform data
   const visibleWaveform = useMemo(() => {
@@ -82,7 +82,7 @@ export function WaveForm2({
     // but pad with empty bars at the beginning so it grows from right to left
     if (waveform.length <= windowSize) {
       // Create padding at the start to align data to the right
-      const padding = Array(windowSize - waveform.length).fill(0.2);
+      const padding = Array(windowSize - waveform.length).fill(0.2) as number[];
       return [...padding, ...waveform];
     }
 

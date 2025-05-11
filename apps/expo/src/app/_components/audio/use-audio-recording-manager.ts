@@ -74,7 +74,7 @@ export function useAudioRecordingManager(
 
   // Poll player position more frequently during playback
   useEffect(() => {
-    if (player && playerStatus.playing) {
+    if (playerStatus.playing) {
       const timer = setInterval(() => {
         // Get current time directly from player
         const currentTime = player.currentTime;

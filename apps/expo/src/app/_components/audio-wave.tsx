@@ -6,8 +6,8 @@
   • Knob + progress line use a `translateX` transform (supported by native driver).
   • Tap or drag anywhere on the waveform to seek; animation restarts at new spot.
 */
-import type { LayoutChangeEvent } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import type { GestureResponderEvent, LayoutChangeEvent } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   Easing,
@@ -66,23 +66,29 @@ export default function AudioWave({
     running.current?.stop();
     running.current = null;
   }
-  function start(fromNorm: number) {
-    const ms = (1 - fromNorm) * total * 1000;
-    running.current = Animated.timing(progress, {
-      toValue: 1,
-      duration: ms,
-      easing: Easing.linear,
-      useNativeDriver: true, // UI‑thread animation
-    });
-    running.current.start(
-      ({ finished }) => finished && (running.current = null),
-    );
-  }
+  const start = useCallback(
+    (fromNorm: number) => {
+      const ms = (1 - fromNorm) * total * 1000;
+      running.current = Animated.timing(progress, {
+        toValue: 1,
+        duration: ms,
+        easing: Easing.linear,
+        useNativeDriver: true, // UI‑thread animation
+      });
+      running.current.start(
+        ({ finished }) => finished && (running.current = null),
+      );
+    },
+    [progress, total],
+  );
 
-  function seek(norm: number) {
-    progress.setValue(norm);
-    onSeek?.(norm * total);
-  }
+  const seek = useCallback(
+    (norm: number) => {
+      progress.setValue(norm);
+      onSeek?.(norm * total);
+    },
+    [onSeek, progress, total],
+  );
 
   /* ───────── watch playback state */
   useEffect(() => {
@@ -95,14 +101,23 @@ export default function AudioWave({
       stop();
       seek(norm);
     }
-  }, [status.playing, status.duration, uri]);
+  }, [
+    status.playing,
+    status.duration,
+    uri,
+    status.currentTime,
+    total,
+    isRecording,
+    seek,
+    start,
+  ]);
 
   /* external currentTime (e.g. controlled) */
   useEffect(() => {
     if (!status.playing) {
       progress.setValue((currentTime || 0) / total);
     }
-  }, [currentTime, status.playing]);
+  }, [currentTime, progress, status.playing, total]);
 
   /* ───────── tap / drag */
   const pan = useRef(
@@ -123,7 +138,7 @@ export default function AudioWave({
   ).current;
 
   /* quick tap */
-  function handlePress(e: any) {
+  function handlePress(e: GestureResponderEvent) {
     if (!uri || isRecording || !onSeek) return;
     const norm = (e.nativeEvent.pageX - containerX) / widthPx;
     const bounded = Math.max(0, Math.min(norm, 1));
@@ -138,7 +153,7 @@ export default function AudioWave({
   const thick = barW - gap;
   const bars = Array.from({ length: barCount }).map((_, i) => {
     const amp = meterValues.length
-      ? meterValues[Math.floor((i / barCount) * meterValues.length)] || 0
+      ? (meterValues[Math.floor((i / barCount) * meterValues.length)] ?? 0)
       : 0;
     const h = meterValues.length
       ? Math.max(2, Math.min(amp * height * 3, height * 0.95))
