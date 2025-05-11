@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { RecordingOptions } from "expo-audio";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -36,6 +35,7 @@ export interface UseAudioRecordingManagerResult {
   pausePlayback: () => void;
   stopPlayback: () => Promise<void>;
   resetRecording: () => void;
+  seekToPosition: (positionMs: number) => Promise<void>;
 }
 
 export function useAudioRecordingManager(
@@ -245,6 +245,27 @@ export function useAudioRecordingManager(
     recordingStartTimeRef.current = null;
   }, []);
 
+  // Add seekToPosition function
+  const seekToPosition = useCallback(
+    async (positionMs: number) => {
+      try {
+        // Convert ms to seconds for the player API
+        const positionSec = positionMs / 1000;
+        // Ensure position is within valid range
+        const boundedPosition = Math.max(
+          0,
+          Math.min(positionSec, playerStatus.duration || 0),
+        );
+
+        await player.seekTo(boundedPosition);
+        setManualPlaybackPosition(positionMs);
+      } catch (error) {
+        console.error("Failed to seek playback:", error);
+      }
+    },
+    [player, playerStatus.duration],
+  );
+
   // Cleanup
   useEffect(() => {
     return () => {
@@ -283,6 +304,7 @@ export function useAudioRecordingManager(
     pausePlayback,
     stopPlayback,
     resetRecording,
+    seekToPosition,
   };
 }
 

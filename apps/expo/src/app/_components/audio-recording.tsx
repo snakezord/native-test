@@ -1,10 +1,16 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Pressable, Text, View } from "react-native";
 import { RecordingPresets } from "expo-audio";
 
 import { useAudioRecordingManager } from "./audio/use-audio-recording-manager";
 import { WaveForm2 } from "./audio/wave-form-2";
-import WaveFormPlayback from "./audio/wave-form-playback";
+import { WaveFormPlayback } from "./audio/wave-form-playback";
 
 export default function AudioRecording() {
   const {
@@ -25,7 +31,62 @@ export default function AudioRecording() {
     pausePlayback,
     stopPlayback,
     resetRecording,
+    seekToPosition,
   } = useAudioRecordingManager(RecordingPresets.HIGH_QUALITY);
+
+  // Handle seeking when user interacts with the waveform
+  const handleSeek = useCallback(
+    async (progress: number) => {
+      if (!recordingData) {
+        console.log("Cannot seek: No recording data");
+        return;
+      }
+
+      if (!playbackDuration) {
+        console.log(
+          `Cannot seek: Invalid playback duration (${playbackDuration})`,
+        );
+        return;
+      }
+
+      if (isNaN(progress)) {
+        console.log(`Invalid seek progress: NaN`);
+        return;
+      }
+
+      // Ensure progress is within 0-1 range
+      const normalizedProgress = Math.max(0, Math.min(progress, 1));
+
+      try {
+        // Convert progress (0-1) to milliseconds
+        const positionMs = Math.floor(normalizedProgress * playbackDuration);
+        console.log(
+          `Seeking to ${positionMs}ms (progress=${normalizedProgress.toFixed(4)}, duration=${playbackDuration}ms)`,
+        );
+
+        // Start playback if not already playing
+        if (!isPlaying) {
+          console.log("Starting playback during seek");
+          await playRecording();
+        }
+
+        await seekToPosition(positionMs);
+      } catch (error) {
+        console.error("Error during seek:", error);
+      }
+    },
+    [recordingData, playbackDuration, seekToPosition, isPlaying, playRecording],
+  );
+
+  // Track the last progress for smoother waveform updates during seeking
+  const [lastProgress, setLastProgress] = useState(0);
+
+  // Update progress value whenever playbackPosition changes
+  useEffect(() => {
+    if (playbackDuration > 0) {
+      setLastProgress(playbackPosition / playbackDuration);
+    }
+  }, [playbackPosition, playbackDuration]);
 
   // Format time in mm:ss format
   const formatTime = useCallback((milliseconds: number) => {
@@ -179,20 +240,21 @@ export default function AudioRecording() {
 
         {/* Bottom part: Playback visualization (WaveFormPlayback) - only visible when there's a recording */}
         {recordingData && (
-          <View className="h-16 w-full overflow-hidden rounded-b-lg bg-gray-100">
+          <View
+            className="h-16 w-full overflow-hidden rounded-b-lg bg-gray-100"
+            style={{ position: "relative" }}
+          >
             <WaveFormPlayback
               waveform={recordingData.waveformData}
-              progress={
-                isPlaying && playbackDuration > 0
-                  ? playbackPosition / playbackDuration
-                  : 0
-              }
+              progress={lastProgress}
               maxBars={120}
               barSpacing={0.5}
               fixedBarWidth={1.75}
+              onSeek={handleSeek}
               {...waveformBaseProps}
               minOpacity={0.2}
-              volumePower={3}
+              volumePower={2.5}
+              activeBarClassName="bg-primary opacity-100"
             />
           </View>
         )}
