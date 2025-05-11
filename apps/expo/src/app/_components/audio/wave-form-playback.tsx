@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { View } from "react-native";
 import Animated from "react-native-reanimated";
 
@@ -14,6 +14,8 @@ export interface WaveFormPlaybackProps {
   minOpacity?: number;
   volumePower?: number;
   maxBars?: number;
+  fixedBarWidth?: number; // Width in pixels (if provided, overrides percentage-based width)
+  barSpacing?: number; // Spacing between bars in pixels
 }
 
 /**
@@ -30,26 +32,61 @@ export function WaveFormPlayback({
   minOpacity = 0.2,
   volumePower = 1.5,
   maxBars = 100,
+  fixedBarWidth,
+  barSpacing = 0.25,
 }: WaveFormPlaybackProps) {
+  // Debug the input parameters
+  useEffect(() => {
+    console.log(
+      `WaveFormPlayback props - maxBars: ${maxBars}, waveform length: ${waveform.length || 0}`,
+    );
+  }, [maxBars, waveform]);
+
   // Sample data points to fit within maxBars
   const sampledWaveform = useMemo(() => {
     if (!waveform.length) {
+      console.log(
+        `No waveform data, creating empty array with ${maxBars} bars`,
+      );
       return Array(maxBars).fill(0.2) as number[];
     }
 
-    // If we have fewer data points than maxBars, use all of them
-    if (waveform.length <= maxBars) {
-      return waveform;
+    // Ensure maxBars is a positive number
+    const targetBars = Math.max(1, maxBars);
+
+    console.log(
+      `WaveFormPlayback: Original waveform length: ${waveform.length}, targeting ${targetBars} bars`,
+    );
+
+    // Always interpolate data to fill the entire targetBars array
+    // This ensures we always use ALL available audio data spread evenly
+    const result: number[] = new Array(targetBars) as number[];
+
+    // Simple interpolation algorithm to spread the data evenly
+    if (waveform.length === 1) {
+      // Special case: if we have only one data point, use it for all bars
+      return Array(targetBars).fill(waveform[0]) as number[];
     }
 
-    // Sample evenly across the full waveform to fit maxBars
-    const result = [];
-    const step = waveform.length / maxBars;
+    // Use all of the waveform data, stretched or compressed to fit exactly targetBars
+    for (let i = 0; i < targetBars; i++) {
+      // Calculate a position in the original waveform array, scaled to the target size
+      const position = (i / (targetBars - 1)) * (waveform.length - 1);
+      const lowerIndex = Math.floor(position);
+      const upperIndex = Math.min(lowerIndex + 1, waveform.length - 1);
+      const weight = position - lowerIndex;
 
-    for (let i = 0; i < maxBars; i++) {
-      const index = Math.min(Math.floor(i * step), waveform.length - 1);
-      result.push(waveform[index] ?? 0);
+      // Linear interpolation between the two closest points
+      if (lowerIndex === upperIndex) {
+        result[i] = waveform[lowerIndex]!;
+      } else {
+        result[i] =
+          (waveform[lowerIndex] ?? 0) * (1 - weight) +
+          (waveform[upperIndex] ?? 0) * weight;
+      }
     }
+
+    console.log(`Sampled waveform created with ${result.length} bars`);
 
     return result;
   }, [waveform, maxBars]);
@@ -60,14 +97,20 @@ export function WaveFormPlayback({
 
     // Find the maximum value for normalization
     const max = Math.max(...sampledWaveform, 0.01);
+    console.log(`Normalizing with max value: ${max}`);
 
-    return sampledWaveform.map((value) => {
+    // Apply transformation to enhance differences between loud and quiet parts
+    const result = sampledWaveform.map((value) => {
       // Normalize to 0-1
       const normalized = Math.max(value / max, 0);
 
       // Apply power function for better visualization
       return Math.max(0.05, Math.pow(normalized, volumePower));
     });
+
+    console.log("Enhanced waveform processing complete");
+
+    return result;
   }, [sampledWaveform, volumePower, maxBars]);
 
   // Calculate which bars should be active based on playback progress
@@ -75,13 +118,32 @@ export function WaveFormPlayback({
     return Math.floor(enhancedWaveform.length * progress);
   }, [enhancedWaveform.length, progress]);
 
-  // Calculate the width of each bar based on container width
-  const barWidth = useMemo(() => {
-    // Calculate available width (assuming 100% width with 4px padding on each side)
-    const totalBars = enhancedWaveform.length;
-    // Leave minimal spacing between bars (0.5px)
-    return totalBars > 0 ? Math.max(1, (100 - 8) / totalBars - 0.5) : 1;
-  }, [enhancedWaveform.length]);
+  // Calculate the width of each bar based on container width if fixed width is not provided
+  const calculatedBarWidth = useMemo(() => {
+    if (fixedBarWidth) {
+      return fixedBarWidth;
+    }
+
+    // Calculate percentage width - ensure all bars fit within the container
+    const totalBars = enhancedWaveform.length || maxBars;
+    const totalSpacing = barSpacing * 2 * totalBars;
+
+    // Calculate percentage width: (100% - total spacing) / number of bars
+    const widthPerBar =
+      totalBars > 0 ? Math.max(0.5, (100 - totalSpacing) / totalBars) : 1;
+    console.log(`Calculated bar width: ${widthPerBar}% for ${totalBars} bars`);
+
+    return widthPerBar;
+  }, [enhancedWaveform.length, fixedBarWidth, barSpacing, maxBars]);
+
+  // No separate displayWaveform - use enhancedWaveform directly since it should already be exactly maxBars in length
+  const barCount = enhancedWaveform.length;
+
+  useEffect(() => {
+    console.log(
+      `Rendering WaveFormPlayback with ${barCount} bars, maxBars=${maxBars}`,
+    );
+  }, [barCount, maxBars]);
 
   return (
     <View className="flex-1 flex-row items-center justify-center px-2">
@@ -100,8 +162,11 @@ export function WaveFormPlayback({
             style={{
               height: `${barHeight}%`,
               opacity,
-              width: `${barWidth}%`,
-              marginHorizontal: 0.25,
+              // Use fixed width in pixels or percentage based on what's provided
+              ...(fixedBarWidth
+                ? { width: fixedBarWidth }
+                : { width: `${calculatedBarWidth}%` }),
+              marginHorizontal: barSpacing,
             }}
             className={cn(
               "rounded-full",

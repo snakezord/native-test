@@ -20,9 +20,11 @@ declare module "next-auth" {
 }
 
 const adapter = DrizzleAdapter(db, {
+  // User
   usersTable: User,
   accountsTable: Account,
   sessionsTable: Session,
+  // Audio TODO.
 });
 
 export const isSecureContext = env.NODE_ENV !== "development";

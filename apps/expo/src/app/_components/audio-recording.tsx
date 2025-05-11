@@ -147,8 +147,8 @@ export default function AudioRecording() {
   const waveformBaseProps = {
     barClassName: "bg-gray-700",
     activeBarClassName: "bg-primary",
-    minBarHeight: 3,
-    maxBarHeight: 75,
+    minBarHeight: 5,
+    maxBarHeight: 85,
     minOpacity: 0.25,
     volumePower: 1.5,
   };
@@ -170,8 +170,8 @@ export default function AudioRecording() {
             waveform={waveformData}
             isRecording={isRecording}
             progress={0}
-            barCount={30}
-            barWidth={5}
+            barCount={25}
+            barWidth={7}
             barSpacing={3}
             {...waveformBaseProps}
           />
@@ -187,8 +187,12 @@ export default function AudioRecording() {
                   ? playbackPosition / playbackDuration
                   : 0
               }
-              maxBars={80}
+              maxBars={120}
+              barSpacing={0.5}
+              fixedBarWidth={1.75}
               {...waveformBaseProps}
+              minOpacity={0.2}
+              volumePower={3}
             />
           </View>
         )}
