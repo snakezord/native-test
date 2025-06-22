@@ -22,6 +22,8 @@ export default function AudioRecording() {
     playbackPosition,
     playbackDuration,
     recordingData,
+    hasPermission,
+    permissionError,
 
     startRecording,
     pauseRecording,
@@ -32,6 +34,7 @@ export default function AudioRecording() {
     stopPlayback,
     resetRecording,
     seekToPosition,
+    requestPermission,
   } = useAudioRecordingManager(RecordingPresets.HIGH_QUALITY);
 
   // Handle seeking when user interacts with the waveform
@@ -147,6 +150,8 @@ export default function AudioRecording() {
 
   // Determine status text
   const getStatusText = () => {
+    if (permissionError) return permissionError;
+    if (!hasPermission) return "Microphone permission required";
     if (isRecording) return "Recording in progress...";
     if (isPaused) return "Recording paused";
     if (isPlaying) return "Playing recording...";
@@ -277,7 +282,15 @@ export default function AudioRecording() {
 
       {/* Control buttons */}
       <View className="my-2 w-full flex-row justify-center space-x-4">
-        {!isRecording && !isPaused && !isPlaying && !recordingData ? (
+        {!hasPermission ? (
+          /* Request permission button */
+          <Pressable
+            className="h-14 w-32 items-center justify-center rounded-full bg-blue-500"
+            onPress={requestPermission}
+          >
+            <Text className="text-sm font-medium text-white">Allow Mic</Text>
+          </Pressable>
+        ) : !isRecording && !isPaused && !isPlaying && !recordingData ? (
           /* Start recording */
           <Pressable
             className="h-14 w-14 items-center justify-center rounded-full bg-red-500"

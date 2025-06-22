@@ -140,8 +140,8 @@ importers:
         specifier: 53.0.9
         version: 53.0.9(@babel/core@7.27.4)(@expo/metro-runtime@5.0.4(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0)))(bufferutil@4.0.9)(graphql@15.8.0)(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0))(react@19.0.0)
       expo-audio:
-        specifier: ^0.4.5
-        version: 0.4.5(expo@53.0.9(@babel/core@7.27.4)(@expo/metro-runtime@5.0.4(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0)))(bufferutil@4.0.9)(graphql@15.8.0)(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0))(react@19.0.0))(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0))(react@19.0.0)
+        specifier: ^0.4.6
+        version: 0.4.6(expo@53.0.9(@babel/core@7.27.4)(@expo/metro-runtime@5.0.4(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0)))(bufferutil@4.0.9)(graphql@15.8.0)(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0))(react@19.0.0))(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0))(react@19.0.0)
       expo-constants:
         specifier: 17.1.6
         version: 17.1.6(expo@53.0.9(@babel/core@7.27.4)(@expo/metro-runtime@5.0.4(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0)))(bufferutil@4.0.9)(graphql@15.8.0)(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0))(react@19.0.0))(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0))
@@ -5103,8 +5103,8 @@ packages:
       react: '*'
       react-native: '*'
 
-  expo-audio@0.4.5:
-    resolution: {integrity: sha512-QYJ9yLFAfH+YPYheqolbYL812lZWAsZVuRPrM6LZBsYYocaTTVVLQj+nggXKZwAjrIpQwpvH7jcziJy22I5Xpw==}
+  expo-audio@0.4.6:
+    resolution: {integrity: sha512-/pgz0AnQHnyJWkPfTp/3gBDib6FZYnscpktFZgmPeTeCK8KkPV4+eV2oEDDbSe2ngUrqDA0WVO4MX2Mfeec9ZA==}
     peerDependencies:
       expo: '*'
       react: '*'
@@ -13773,7 +13773,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  expo-audio@0.4.5(expo@53.0.9(@babel/core@7.27.4)(@expo/metro-runtime@5.0.4(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0)))(bufferutil@4.0.9)(graphql@15.8.0)(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0))(react@19.0.0))(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0))(react@19.0.0):
+  expo-audio@0.4.6(expo@53.0.9(@babel/core@7.27.4)(@expo/metro-runtime@5.0.4(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0)))(bufferutil@4.0.9)(graphql@15.8.0)(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0))(react@19.0.0))(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0))(react@19.0.0):
     dependencies:
       expo: 53.0.9(@babel/core@7.27.4)(@expo/metro-runtime@5.0.4(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0)))(bufferutil@4.0.9)(graphql@15.8.0)(react-native@0.79.2(@babel/core@7.27.4)(@types/react@19.1.2)(bufferutil@4.0.9)(react@19.0.0))(react@19.0.0)
       react: 19.0.0

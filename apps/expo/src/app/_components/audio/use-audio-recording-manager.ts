@@ -1,6 +1,7 @@
 import type { RecordingOptions } from "expo-audio";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  AudioModule,
   RecordingPresets,
   useAudioPlayer,
   useAudioPlayerStatus,
@@ -26,6 +27,10 @@ export interface UseAudioRecordingManagerResult {
   playbackPosition: number;
   playbackDuration: number;
 
+  // Permission states
+  hasPermission: boolean;
+  permissionError: string | null;
+
   // Actions
   startRecording: () => Promise<void>;
   pauseRecording: () => void;
@@ -36,6 +41,7 @@ export interface UseAudioRecordingManagerResult {
   stopPlayback: () => Promise<void>;
   resetRecording: () => void;
   seekToPosition: (positionMs: number) => Promise<void>;
+  requestPermission: () => Promise<boolean>;
 }
 
 export function useAudioRecordingManager(
@@ -60,6 +66,10 @@ export function useAudioRecordingManager(
   const [manualDuration, setManualDuration] = useState(0);
   const recordingStartTimeRef = useRef<number | null>(null);
   const pausedDurationRef = useRef(0);
+
+  // Permission states
+  const [hasPermission, setHasPermission] = useState(false);
+  const [permissionError, setPermissionError] = useState<string | null>(null);
 
   // Initialize recorder and player
   const recorder = useAudioRecorder(options);
@@ -125,9 +135,55 @@ export function useAudioRecordingManager(
   const isPaused = isPausedState;
   const isPlaying = Boolean(playerStatus.playing);
 
+  // Permission handling
+  const requestPermission = useCallback(async (): Promise<boolean> => {
+    try {
+      setPermissionError(null);
+      const status = await AudioModule.requestRecordingPermissionsAsync();
+      const granted = status.granted;
+      setHasPermission(granted);
+
+      if (!granted) {
+        setPermissionError("Recording permission was denied");
+      }
+
+      return granted;
+    } catch (error) {
+      const errorMessage = "Failed to request recording permission";
+      setPermissionError(errorMessage);
+      console.error(errorMessage, error);
+      return false;
+    }
+  }, []);
+
+  // Check permissions on mount
+  useEffect(() => {
+    void (async () => {
+      try {
+        const status = await AudioModule.getRecordingPermissionsAsync();
+        setHasPermission(status.granted);
+        if (!status.granted) {
+          // Try to request permission automatically
+          await requestPermission();
+        }
+      } catch (error) {
+        console.error("Failed to check recording permissions:", error);
+        setPermissionError("Failed to check recording permissions");
+      }
+    })();
+  }, [requestPermission]);
+
   // Recording actions
   const startRecording = useCallback(async () => {
     try {
+      // Check permissions before recording
+      if (!hasPermission) {
+        const granted = await requestPermission();
+        if (!granted) {
+          throw new Error("Recording permission not granted");
+        }
+      }
+
       // Reset states
       setRecordingData(null);
       setIsPausedState(false);
@@ -143,8 +199,11 @@ export function useAudioRecordingManager(
       recorder.record();
     } catch (error) {
       console.error("Failed to start recording:", error);
+      if (error instanceof Error && error.message.includes("permission")) {
+        setPermissionError(error.message);
+      }
     }
-  }, [recorder, options]);
+  }, [recorder, options, hasPermission, requestPermission]);
 
   const pauseRecording = useCallback(() => {
     if (isRecording) {
@@ -295,6 +354,10 @@ export function useAudioRecordingManager(
       manualPlaybackPosition || playerStatus.currentTime * 1000 || 0,
     playbackDuration: playerStatus.duration * 1000 || 0, // Convert to ms
 
+    // Permission states
+    hasPermission,
+    permissionError,
+
     // Actions
     startRecording,
     pauseRecording,
@@ -305,6 +368,7 @@ export function useAudioRecordingManager(
     stopPlayback,
     resetRecording,
     seekToPosition,
+    requestPermission,
   };
 }
 
