@@ -14,6 +14,18 @@ catalog:
   prettier: ^3.5.3
   tailwindcss: ^3.4.15
   typescript: ^5.8.3
+  "@types/node": ^24.0.3
+
+  # UI & Styling
+  "tailwind-merge": ^3.3.1
+  "class-variance-authority": ^0.7.1
+  "clsx": ^2.1.1
+
+  # Three.js & Web GL
+  "three": ^0.160.1
+  "@types/three": ^0.152.1
+  "@react-three/fiber": ^9.1.2
+  "@react-three/drei": ^10.3.0
 
   # Misc
   zod: ^3.24.3
