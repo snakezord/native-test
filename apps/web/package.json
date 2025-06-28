@@ -10,28 +10,24 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@radix-ui/react-checkbox": "^1.3.2",
-    "@radix-ui/react-label": "^2.1.7",
-    "@radix-ui/react-slider": "^1.3.5",
-    "@radix-ui/react-slot": "^1.2.3",
+    "@acme/ui": "workspace:*",
     "@react-three/drei": "catalog:",
     "@react-three/fiber": "catalog:",
-    "@tailwindcss/vite": "^4.1.10",
-    "class-variance-authority": "catalog:",
-    "clsx": "catalog:",
     "lucide-react": "^0.522.0",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
-    "tailwind-merge": "catalog:",
-    "tailwindcss": "^4.1.10",
     "three": "catalog:"
   },
   "devDependencies": {
+    "@acme/tailwind-config": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",
     "@types/three": "catalog:",
     "@vitejs/plugin-react": "^4.5.2",
+    "autoprefixer": "catalog:",
+    "postcss": "catalog:",
+    "tailwindcss": "catalog:",
     "tw-animate-css": "^1.3.4",
     "typescript": "catalog:",
     "vite": "^6.3.5"

@@ -1,16 +1,25 @@
-import { OrbitControls, useFBO } from "@react-three/drei";
-import { Canvas, useFrame, extend, createPortal } from "@react-three/fiber";
-import { useMemo, useRef, useCallback, memo, useEffect } from "react";
-import * as THREE from "three";
-
-import { SimulationMaterial } from "@/lib/particles/materials";
+import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { VoiceRecorder } from "@/components/audio";
 import { useAudioReactiveParticles } from "@/hooks/use-audio-reactive-particles";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Slider } from "@/components/ui/slider";
-import { Badge } from "@/components/ui/badge";
+import { SimulationMaterial } from "@/lib/particles/materials";
+import {
+  particleFragmentShader,
+  particleVertexShader,
+} from "@/lib/particles/shaders";
+import { OrbitControls, useFBO } from "@react-three/drei";
+import { Canvas, createPortal, extend, useFrame } from "@react-three/fiber";
+import * as THREE from "three";
+
+import {
+  Badge,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Checkbox,
+  Label,
+  Slider,
+} from "@acme/ui";
 
 // Import types from the hook
 interface AudioData {
@@ -53,11 +62,6 @@ interface ParticleUniforms
 interface TypedSimulationMaterial extends SimulationMaterial {
   uniforms: SimulationUniforms;
 }
-
-import {
-  particleVertexShader,
-  particleFragmentShader,
-} from "@/lib/particles/shaders";
 
 // Define interfaces for component props
 interface FBOParticlesProps {
@@ -142,7 +146,7 @@ const FBOParticles = memo(
     const scene = useMemo(() => new THREE.Scene(), []);
     const camera = useMemo(
       () => new THREE.OrthographicCamera(-1, 1, 1, -1, 1 / Math.pow(2, 53), 1),
-      []
+      [],
     );
 
     const positions = useMemo(
@@ -150,12 +154,12 @@ const FBOParticles = memo(
         new Float32Array([
           -1, -1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, 1, 1, 0, -1, 1, 0,
         ]),
-      []
+      [],
     );
 
     const uvs = useMemo(
       () => new Float32Array([0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0]),
-      []
+      [],
     );
 
     // Create two render targets for double buffering
@@ -196,7 +200,7 @@ const FBOParticles = memo(
           value: null,
         },
       }),
-      []
+      [],
     );
 
     // Initialize interpolation refs only on mount, not on every re-render
@@ -230,37 +234,37 @@ const FBOParticles = memo(
       currentNoiseIntensity.current = THREE.MathUtils.lerp(
         currentNoiseIntensity.current,
         noiseIntensity,
-        lerpFactor
+        lerpFactor,
       );
 
       currentPulseAmplitude.current = THREE.MathUtils.lerp(
         currentPulseAmplitude.current,
         pulseAmplitude,
-        lerpFactor
+        lerpFactor,
       );
 
       currentTorusMode.current = THREE.MathUtils.lerp(
         currentTorusMode.current,
         torusMode ? 1.0 : 0.0,
-        lerpFactor
+        lerpFactor,
       );
 
       currentTorusRadius.current = THREE.MathUtils.lerp(
         currentTorusRadius.current,
         torusRadius,
-        lerpFactor
+        lerpFactor,
       );
 
       currentTorusSpeed.current = THREE.MathUtils.lerp(
         currentTorusSpeed.current,
         torusSpeed,
-        lerpFactor
+        lerpFactor,
       );
 
       currentTorusMinorRadius.current = THREE.MathUtils.lerp(
         currentTorusMinorRadius.current,
         torusMinorRadius,
-        lerpFactor
+        lerpFactor,
       );
 
       // Update rotation angle based on current speed and delta time
@@ -374,7 +378,7 @@ const FBOParticles = memo(
               <bufferAttribute attach="attributes-uv" args={[uvs, 2]} />
             </bufferGeometry>
           </mesh>,
-          scene
+          scene,
         )}
         <points ref={points}>
           <bufferGeometry>
@@ -393,7 +397,7 @@ const FBOParticles = memo(
         </points>
       </>
     );
-  }
+  },
 );
 
 const Controls = memo(
@@ -417,52 +421,52 @@ const Controls = memo(
       (value: number[]) => {
         setNoiseIntensity(value[0]);
       },
-      [setNoiseIntensity]
+      [setNoiseIntensity],
     );
 
     const handlePulseChange = useCallback(
       (value: number[]) => {
         setPulseAmplitude(value[0]);
       },
-      [setPulseAmplitude]
+      [setPulseAmplitude],
     );
 
     const handleTorusModeChange = useCallback(
       (checked: boolean) => {
         setTorusMode(checked);
       },
-      [setTorusMode]
+      [setTorusMode],
     );
 
     const handleTorusRadiusChange = useCallback(
       (value: number[]) => {
         setTorusRadius(value[0]);
       },
-      [setTorusRadius]
+      [setTorusRadius],
     );
 
     const handleTorusSpeedChange = useCallback(
       (value: number[]) => {
         setTorusSpeed(value[0]);
       },
-      [setTorusSpeed]
+      [setTorusSpeed],
     );
 
     const handleTorusMinorRadiusChange = useCallback(
       (value: number[]) => {
         setTorusMinorRadius(value[0]);
       },
-      [setTorusMinorRadius]
+      [setTorusMinorRadius],
     );
 
     return (
-      <Card className="bg-black/80 backdrop-blur-lg border-blue-500/30 text-white w-[320px]">
+      <Card className="w-[320px] border-blue-500/30 bg-black/80 text-white backdrop-blur-lg">
         <CardHeader className="pb-4">
-          <CardTitle className="text-blue-400 text-lg font-bold flex items-center justify-between">
+          <CardTitle className="flex items-center justify-between text-lg font-bold text-blue-400">
             <span>Particle Controls</span>
-            <div className="h-5 flex items-center">
+            <div className="flex h-5 items-center">
               {isAudioReactive && (
-                <Badge className="bg-green-500/20 text-green-400 border-green-500 text-xs">
+                <Badge className="border-green-500 bg-green-500/20 text-xs text-green-400">
                   🎵 AUDIO REACTIVE
                 </Badge>
               )}
@@ -498,21 +502,21 @@ const Controls = memo(
             />
           </div>
 
-          <div className="pt-4 border-t border-blue-500/30 space-y-4">
+          <div className="space-y-4 border-t border-blue-500/30 pt-4">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="torus-mode"
                 checked={torusMode}
                 onCheckedChange={handleTorusModeChange}
               />
-              <Label htmlFor="torus-mode" className="text-sm cursor-pointer">
+              <Label htmlFor="torus-mode" className="cursor-pointer text-sm">
                 Torus Mode
               </Label>
             </div>
 
             <div
-              className={`space-y-4 pl-6 border-l-2 border-blue-500/20 transition-opacity duration-200 ${
-                torusMode ? "opacity-100" : "opacity-30 pointer-events-none"
+              className={`space-y-4 border-l-2 border-blue-500/20 pl-6 transition-opacity duration-200 ${
+                torusMode ? "opacity-100" : "pointer-events-none opacity-30"
               }`}
             >
               <div className="space-y-2">
@@ -564,7 +568,7 @@ const Controls = memo(
         </CardContent>
       </Card>
     );
-  }
+  },
 );
 
 const ThreeScene = memo(
@@ -592,7 +596,7 @@ const ThreeScene = memo(
         </Canvas>
       </div>
     );
-  }
+  },
 );
 
 const Scene = () => {
@@ -616,7 +620,7 @@ const Scene = () => {
     (audioData: AudioData) => {
       processAudioData(audioData);
     },
-    [processAudioData]
+    [processAudioData],
   );
 
   // Debug particle params changes (commented out to prevent spam)
@@ -626,7 +630,7 @@ const Scene = () => {
 
   return (
     <>
-      <div className="absolute top-5 left-5 z-[1000] flex flex-col gap-5">
+      <div className="absolute left-5 top-5 z-[1000] flex flex-col gap-5">
         <Controls
           noiseIntensity={baseParams.noiseIntensity}
           setNoiseIntensity={setNoiseIntensity}

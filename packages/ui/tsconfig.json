@@ -3,7 +3,10 @@
   "compilerOptions": {
     "lib": ["ES2022", "dom", "dom.iterable"],
     "jsx": "preserve",
-    "rootDir": "."
+    "rootDir": ".",
+    "paths": {
+      "@acme/ui": ["./src/index.ts"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules"]

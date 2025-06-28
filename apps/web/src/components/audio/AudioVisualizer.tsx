@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Scene from "@/App";
 import { useAudioAnalyzer } from "@/components/audio/useAudioAnalyzer";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@acme/ui";
 
 interface AudioVisualizerProps {
   className?: string;
@@ -41,18 +41,18 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({ className }) => {
   }, [audioData]);
 
   return (
-    <div className={`relative w-screen h-screen ${className || ""}`}>
+    <div className={`relative h-screen w-screen ${className || ""}`}>
       {/* Audio Controls */}
-      <Card className="absolute top-5 right-5 z-[1000] bg-black/70 backdrop-blur-lg border-blue-500/30 text-white min-w-[200px]">
+      <Card className="absolute right-5 top-5 z-[1000] min-w-[200px] border-blue-500/30 bg-black/70 text-white backdrop-blur-lg">
         <CardHeader className="pb-3">
-          <CardTitle className="text-blue-400 text-base">
+          <CardTitle className="text-base text-blue-400">
             Audio Visualizer
           </CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-4">
           {/* Audio Data Display */}
-          <div className="text-xs text-gray-300 space-y-1">
+          <div className="space-y-1 text-xs text-gray-300">
             <div>Amplitude: {audioData.amplitude.toFixed(3)}</div>
             <div>Frequency: {audioData.frequency.toFixed(0)} Hz</div>
             <div>Status: {audioData.isPlaying ? "Playing" : "Stopped"}</div>
@@ -60,7 +60,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({ className }) => {
 
           <Button
             onClick={handlePlayPause}
-            variant={isPlaying ? "destructive" : "default"}
+            variant={isPlaying ? "destructive" : "primary"}
             size="sm"
             className="w-full"
           >
@@ -77,7 +77,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({ className }) => {
                 audioRef.current.src = url;
               }
             }}
-            className="block text-xs text-white w-full file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:cursor-pointer cursor-pointer"
+            className="block w-full cursor-pointer text-xs text-white file:mr-2 file:cursor-pointer file:rounded file:border-0 file:bg-blue-600 file:px-2 file:py-1 file:text-xs file:text-white hover:file:bg-blue-700"
           />
         </CardContent>
       </Card>

@@ -1,8 +1,13 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Slider } from "@/components/ui/slider";
-import { Badge } from "@/components/ui/badge";
+import {
+  Badge,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Checkbox,
+  Label,
+  Slider,
+} from "@acme/ui";
 
 interface ParticleControlsProps {
   noiseIntensity: number;
@@ -19,7 +24,7 @@ interface ParticleControlsProps {
   setTorusMinorRadius: (value: number) => void;
   isAudioReactive: boolean;
   onTriggerLoading: (
-    type: "processing" | "analyzing" | "generating" | "idle"
+    type: "processing" | "analyzing" | "generating" | "idle",
   ) => void;
 }
 
@@ -40,7 +45,7 @@ export function ParticleControls({
   onTriggerLoading,
 }: ParticleControlsProps) {
   return (
-    <Card className="bg-black/80 backdrop-blur-lg border-blue-500/30 text-white w-[320px]">
+    <Card className="w-[320px] border-blue-500/30 bg-black/80 text-white backdrop-blur-lg">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           Particle Controls
@@ -93,7 +98,7 @@ export function ParticleControls({
         </div>
 
         {torusMode && (
-          <div className="space-y-4 pl-4 border-l-2 border-blue-500/30">
+          <div className="space-y-4 border-l-2 border-blue-500/30 pl-4">
             <div className="space-y-2">
               <Label className="text-sm">
                 Torus Radius: {torusRadius.toFixed(1)}
@@ -137,22 +142,22 @@ export function ParticleControls({
 
         <div className="space-y-2">
           <Label className="text-sm">Test Loading States</Label>
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => onTriggerLoading("processing")}
-              className="px-3 py-1 text-xs bg-blue-500/20 text-blue-300 rounded"
+              className="rounded bg-blue-500/20 px-3 py-1 text-xs text-blue-300"
             >
               Processing
             </button>
             <button
               onClick={() => onTriggerLoading("analyzing")}
-              className="px-3 py-1 text-xs bg-green-500/20 text-green-300 rounded"
+              className="rounded bg-green-500/20 px-3 py-1 text-xs text-green-300"
             >
               Analyzing
             </button>
             <button
               onClick={() => onTriggerLoading("generating")}
-              className="px-3 py-1 text-xs bg-purple-500/20 text-purple-300 rounded"
+              className="rounded bg-purple-500/20 px-3 py-1 text-xs text-purple-300"
             >
               Generating
             </button>

@@ -1,8 +1,14 @@
 import React, { useEffect } from "react";
 import { useVoice } from "@/hooks/use-voice";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@acme/ui";
 
 interface VoiceRecorderProps {
   className?: string;
@@ -90,12 +96,12 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
 
   return (
     <Card
-      className={`bg-black/80 backdrop-blur-lg border-blue-500/30 text-white min-w-[280px] ${
+      className={`min-w-[280px] border-blue-500/30 bg-black/80 text-white backdrop-blur-lg ${
         className || ""
       }`}
     >
       <CardHeader className="pb-2">
-        <CardTitle className="text-blue-400 text-sm font-bold">
+        <CardTitle className="text-sm font-bold text-blue-400">
           Voice Recorder
         </CardTitle>
       </CardHeader>
@@ -103,10 +109,10 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       <CardContent className="space-y-3">
         {/* Permission Status */}
         <div
-          className={`text-[10px] p-1.5 rounded border ${
+          className={`rounded border p-1.5 text-[10px] ${
             hasPermission === false
-              ? "text-red-400 bg-red-500/10 border-red-500/30"
-              : "text-green-400 bg-green-500/10 border-green-500/30"
+              ? "border-red-500/30 bg-red-500/10 text-red-400"
+              : "border-green-500/30 bg-green-500/10 text-green-400"
           }`}
         >
           {getPermissionMessage()}
@@ -114,14 +120,14 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
 
         {/* Error Display */}
         {error && (
-          <div className="text-[10px] p-2 rounded text-red-400 bg-red-500/20 border border-red-500">
+          <div className="rounded border border-red-500 bg-red-500/20 p-2 text-[10px] text-red-400">
             Error: {error}
           </div>
         )}
 
         {/* Audio Visualization Data */}
         {isRecording && (
-          <div className="text-[10px] p-1.5 rounded text-gray-400 bg-blue-500/10 border border-blue-500/30 space-y-0.5">
+          <div className="space-y-0.5 rounded border border-blue-500/30 bg-blue-500/10 p-1.5 text-[10px] text-gray-400">
             <div className="text-blue-400">🎵 Audio Analysis:</div>
             <div>Amp: {(audioData.amplitude * 100).toFixed(1)}%</div>
             <div>
@@ -135,13 +141,13 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
 
         {/* Volume Meter */}
         <div className="space-y-1.5">
-          <div className="flex justify-between items-center text-[10px] text-gray-300">
+          <div className="flex items-center justify-between text-[10px] text-gray-300">
             <span>Volume: {currentVolume}%</span>
             <Badge
-              className={`text-[10px] px-1.5 py-0.5 ${
+              className={`px-1.5 py-0.5 text-[10px] ${
                 isVoiceDetected
-                  ? "bg-green-500/20 text-green-400 border-green-500"
-                  : "bg-gray-500/20 text-gray-400 border-gray-500"
+                  ? "border-green-500 bg-green-500/20 text-green-400"
+                  : "border-gray-500 bg-gray-500/20 text-gray-400"
               }`}
             >
               {isVoiceDetected ? "🎤" : "🔇"}
@@ -149,10 +155,10 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           </div>
 
           {/* Volume Bar */}
-          <div className="w-full h-1.5 bg-white/20 rounded overflow-hidden">
+          <div className="h-1.5 w-full overflow-hidden rounded bg-white/20">
             <div
               className={`h-full transition-all duration-100 ${getVolumeColor(
-                currentVolume
+                currentVolume,
               )}`}
               style={{ width: `${currentVolume}%` }}
             />
@@ -176,9 +182,9 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
               }
             }}
             disabled={hasPermission === false}
-            variant={isRecording ? "destructive" : "default"}
+            variant={isRecording ? "destructive" : "primary"}
             size="sm"
-            className="flex items-center gap-1.5 text-xs px-2 py-1"
+            className="flex items-center gap-1.5 px-2 py-1 text-xs"
           >
             {isRecording ? "⏹️ Stop" : "🎙️ Record"}
           </Button>
@@ -189,7 +195,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
                 onClick={isPlaying ? stopPlayback : playRecording}
                 variant={isPlaying ? "secondary" : "outline"}
                 size="sm"
-                className="flex items-center gap-1.5 text-xs px-2 py-1"
+                className="flex items-center gap-1.5 px-2 py-1 text-xs"
               >
                 {isPlaying ? "⏸️" : "▶️"}
               </Button>
@@ -198,7 +204,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
                 onClick={handleDownload}
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-1.5 text-blue-400 border-blue-500/50 hover:bg-blue-500/10 hover:text-blue-300 text-xs px-2 py-1"
+                className="flex items-center gap-1.5 border-blue-500/50 px-2 py-1 text-xs text-blue-400 hover:bg-blue-500/10 hover:text-blue-300"
               >
                 📥
               </Button>
@@ -207,7 +213,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
                 onClick={clearRecording}
                 variant="ghost"
                 size="sm"
-                className="text-gray-400 hover:text-white text-xs px-2 py-1"
+                className="px-2 py-1 text-xs text-gray-400 hover:text-white"
               >
                 🗑️
               </Button>
@@ -216,19 +222,19 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         </div>
 
         {/* Audio Processing Mode Controls */}
-        <div className="pt-2 border-t border-white/20 space-y-2">
-          <h4 className="text-purple-400 text-xs font-medium">
+        <div className="space-y-2 border-t border-white/20 pt-2">
+          <h4 className="text-xs font-medium text-purple-400">
             Processing Mode
           </h4>
 
           <div className="grid grid-cols-2 gap-2">
             <Button
               onClick={() => setAudioProcessingMode("native")}
-              variant={audioProcessingMode === "native" ? "default" : "outline"}
+              variant={audioProcessingMode === "native" ? "primary" : "outline"}
               size="sm"
-              className={`justify-center text-[10px] py-1 px-2 ${
+              className={`justify-center px-2 py-1 text-[10px] ${
                 audioProcessingMode === "native"
-                  ? "bg-orange-600 hover:bg-orange-700 text-white"
+                  ? "bg-orange-600 text-white hover:bg-orange-700"
                   : "border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
               }`}
               disabled={isRecording}
@@ -238,11 +244,11 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
 
             <Button
               onClick={() => setAudioProcessingMode("raw")}
-              variant={audioProcessingMode === "raw" ? "default" : "outline"}
+              variant={audioProcessingMode === "raw" ? "primary" : "outline"}
               size="sm"
-              className={`justify-center text-[10px] py-1 px-2 ${
+              className={`justify-center px-2 py-1 text-[10px] ${
                 audioProcessingMode === "raw"
-                  ? "bg-gray-600 hover:bg-gray-700 text-white"
+                  ? "bg-gray-600 text-white hover:bg-gray-700"
                   : "border-gray-500/50 text-gray-400 hover:bg-gray-500/10"
               }`}
               disabled={isRecording}
@@ -253,7 +259,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         </div>
 
         {/* Status */}
-        <div className="text-center text-[10px] text-gray-400 pt-1">
+        <div className="pt-1 text-center text-[10px] text-gray-400">
           {isRecording && "🔴 Recording..."}
           {isPlaying && "🔊 Playing..."}
           {!isRecording && !isPlaying && recordedAudio && "✅ Ready"}
