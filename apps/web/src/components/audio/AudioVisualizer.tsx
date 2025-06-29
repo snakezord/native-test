@@ -1,8 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import Scene from "@/App";
 import { useAudioAnalyzer } from "@/components/audio/useAudioAnalyzer";
-
-import { Button, Card, CardContent, CardHeader, CardTitle } from "@acme/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@vibespeak/ui";
 
 interface AudioVisualizerProps {
   className?: string;

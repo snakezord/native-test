@@ -1,5 +1,5 @@
 {
-  "name": "@acme/auth",
+  "name": "@vibespeak/auth",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -18,10 +18,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@acme/db": "workspace:*",
     "@auth/core": "catalog:",
     "@auth/drizzle-adapter": "catalog:",
     "@t3-oss/env-nextjs": "^0.13.6",
+    "@vibespeak/db": "workspace:*",
     "next": "^15.3.3",
     "next-auth": "catalog:",
     "react": "catalog:react19",
@@ -29,13 +29,13 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@acme/eslint-config": "workspace:*",
-    "@acme/prettier-config": "workspace:*",
-    "@acme/tsconfig": "workspace:*",
     "@types/react": "catalog:react19",
+    "@vibespeak/eslint-config": "workspace:*",
+    "@vibespeak/prettier-config": "workspace:*",
+    "@vibespeak/tsconfig": "workspace:*",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"
   },
-  "prettier": "@acme/prettier-config"
+  "prettier": "@vibespeak/prettier-config"
 }

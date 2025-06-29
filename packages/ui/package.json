@@ -1,5 +1,5 @@
 {
-  "name": "@acme/ui",
+  "name": "@vibespeak/ui",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -39,11 +39,11 @@
     "tailwind-merge": "catalog:"
   },
   "devDependencies": {
-    "@acme/eslint-config": "workspace:*",
-    "@acme/prettier-config": "workspace:*",
-    "@acme/tailwind-config": "workspace:*",
-    "@acme/tsconfig": "workspace:*",
     "@types/react": "catalog:react19",
+    "@vibespeak/eslint-config": "workspace:*",
+    "@vibespeak/prettier-config": "workspace:*",
+    "@vibespeak/tailwind-config": "workspace:*",
+    "@vibespeak/tsconfig": "workspace:*",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "react": "catalog:react19",
@@ -54,5 +54,5 @@
     "react": "catalog:react19",
     "zod": "catalog:"
   },
-  "prettier": "@acme/prettier-config"
+  "prettier": "@vibespeak/prettier-config"
 }

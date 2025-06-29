@@ -6,8 +6,8 @@ import type {
 import { skipCSRFCheck } from "@auth/core";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 
-import { db } from "@acme/db/client";
-import { Account, Session, User } from "@acme/db/schema";
+import { db } from "@vibespeak/db/client";
+import { Account, Session, User } from "@vibespeak/db/schema";
 
 import { env } from "../env";
 

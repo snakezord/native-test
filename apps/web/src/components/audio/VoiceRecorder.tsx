@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useVoice } from "@/hooks/use-voice";
-
 import {
   Badge,
   Button,
@@ -8,7 +7,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "@acme/ui";
+} from "@vibespeak/ui";
 
 interface VoiceRecorderProps {
   className?: string;

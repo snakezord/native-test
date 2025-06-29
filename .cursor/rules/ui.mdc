@@ -4,7 +4,7 @@ globs: apps/nextjs/**,packages/ui/**
 alwaysApply: false
 ---
 - Use Shadcn UI components with proper composition and customization
-- Import cn from "@acme/ui"
+- Import cn from "@vibespeak/ui"
 - Leverage Radix UI primitives for accessible interactive components
 - Follow Tailwind CSS class naming conventions and utility patterns
 - Implement mobile-first responsive design with Tailwind breakpoints

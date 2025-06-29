@@ -1,5 +1,5 @@
 {
-  "name": "@acme/web",
+  "name": "@vibespeak/web",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,23 +7,24 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "check-types": "tsc --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "clean": "git clean -xdf .cache .turbo dist build node_modules"
   },
   "dependencies": {
-    "@acme/ui": "workspace:*",
     "@react-three/drei": "catalog:",
     "@react-three/fiber": "catalog:",
+    "@vibespeak/ui": "workspace:*",
     "lucide-react": "^0.522.0",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
     "three": "catalog:"
   },
   "devDependencies": {
-    "@acme/tailwind-config": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",
     "@types/three": "catalog:",
+    "@vibespeak/tailwind-config": "workspace:*",
     "@vitejs/plugin-react": "^4.5.2",
     "autoprefixer": "catalog:",
     "postcss": "catalog:",

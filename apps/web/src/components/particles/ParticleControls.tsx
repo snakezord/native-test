@@ -7,7 +7,7 @@ import {
   Checkbox,
   Label,
   Slider,
-} from "@acme/ui";
+} from "@vibespeak/ui";
 
 interface ParticleControlsProps {
   noiseIntensity: number;

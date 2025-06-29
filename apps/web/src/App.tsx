@@ -8,8 +8,6 @@ import {
 } from "@/lib/particles/shaders";
 import { OrbitControls, useFBO } from "@react-three/drei";
 import { Canvas, createPortal, extend, useFrame } from "@react-three/fiber";
-import * as THREE from "three";
-
 import {
   Badge,
   Card,
@@ -19,7 +17,8 @@ import {
   Checkbox,
   Label,
   Slider,
-} from "@acme/ui";
+} from "@vibespeak/ui";
+import * as THREE from "three";
 
 // Import types from the hook
 interface AudioData {
